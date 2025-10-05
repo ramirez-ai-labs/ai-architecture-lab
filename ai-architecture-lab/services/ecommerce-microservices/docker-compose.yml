@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  api-gateway:
+    image: alpine
+    command: ["/bin/sh", "-c", "echo api-gateway placeholder && sleep 3600"]
+  order-service:
+    image: alpine
+    command: ["/bin/sh", "-c", "echo order-service placeholder && sleep 3600"]
+  payment-service:
+    image: alpine
+    command: ["/bin/sh", "-c", "echo payment-service placeholder && sleep 3600"]
+  inventory-service:
+    image: alpine
+    command: ["/bin/sh", "-c", "echo inventory-service placeholder && sleep 3600"]
