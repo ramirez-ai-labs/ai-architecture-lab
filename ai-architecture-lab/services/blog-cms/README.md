@@ -1,6 +1,6 @@
 # Blog CMS
 
-Layered architecture example service. Contains `src/` and `tests/` directories.
+Layered architecture example service. Contains src/ and tests/ directories.
 
 ## Architecture (Layered)
 
@@ -21,11 +21,17 @@ flowchart TD
   end
 
   subgraph Infrastructure
-    F[Repository Implementations (DB)]
+    F[Repository Implementations - DB]
     G[Notification / Event Bus]
     H[Plugin Adapters]
   end
 
+  A --> B --> C
+  B --> D
+  D --> F
+  C --> E --> G
+  H --> B
+```
   A --> B --> C
   B --> D
   D --> F
