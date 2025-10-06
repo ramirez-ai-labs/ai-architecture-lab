@@ -1,7 +1,15 @@
 # Blog CMS
 
-A sample Blog Content Management System (CMS) built using a **layered architecture**.  
-The project includes a structured `src/` directory for source code and a `tests/` directory for unit and integration tests.
+A sample **Blog Content Management System (CMS)** built using a **layered architecture**.  
+This project serves as a **software architecture showcase**, demonstrating clear separation of concerns, the repository pattern, and simple event-driven hooks.
+
+---
+
+## 📁 Directory Highlights
+
+- `src/` — application source (presentation, application, domain, infrastructure)
+- `tests/` — unit and integration tests
+- `docs/` — architecture docs, ADRs, and diagrams
 
 ---
 
@@ -22,10 +30,17 @@ flowchart TD
   subgraph Domain
     C[Entities & Domain Services]
     D[Repository Interfaces]
+    E[Domain Events]
   end
 
   subgraph Infrastructure
-    E[Database / External APIs / Framework Integrations]
+    F[Repository Implementations (DB)]
+    G[Notification / Event Bus]
+    H[Plugin Adapters]
   end
 
-  A --> B --> C --> D --> E
+  A --> B --> C
+  B --> D
+  D --> F
+  C --> E --> G
+  H --> B
