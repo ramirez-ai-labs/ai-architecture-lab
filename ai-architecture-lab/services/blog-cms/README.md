@@ -6,7 +6,6 @@ This project serves as a **software architecture showcase**, demonstrating clear
 ---
 
 ## 📁 Directory Highlights
-
 - `src/` — application source (presentation, application, domain, infrastructure)
 - `tests/` — unit and integration tests
 - `docs/` — architecture docs, ADRs, and diagrams
@@ -17,30 +16,35 @@ This project serves as a **software architecture showcase**, demonstrating clear
 
 ```mermaid
 flowchart TD
-  title[Layered Blog/CMS Architecture]
+
+  %% Title
+  %% (GitHub Mermaid doesn't support top-level titles, so we comment it)
+  %% Layered Blog/CMS Architecture
 
   subgraph Presentation
-    A[HTTP / GraphQL Controllers]
+    A["HTTP or GraphQL Controllers"]
   end
 
   subgraph Application
-    B[Use Cases / Application Services]
+    B["Use Cases / Application Services"]
   end
 
   subgraph Domain
-    C[Entities & Domain Services]
-    D[Repository Interfaces]
-    E[Domain Events]
+    C["Entities & Domain Services"]
+    D["Repository Interfaces"]
+    E["Domain Events"]
   end
 
   subgraph Infrastructure
-    F[Repository Implementations (DB)]
-    G[Notification / Event Bus]
-    H[Plugin Adapters]
+    F["Repository Implementations (DB)"]
+    G["Notification / Event Bus"]
+    H["Plugin Adapters"]
   end
 
-  A --> B --> C
+  A --> B
+  B --> C
   B --> D
   D --> F
-  C --> E --> G
+  C --> E
+  E --> G
   H --> B
