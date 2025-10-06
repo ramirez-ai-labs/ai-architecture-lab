@@ -1,5 +1,6 @@
 # ADR 0002 - Separation of Concerns: Layered Architecture
 
+Date: 2025-10-05
 Status: Accepted
 
 Context

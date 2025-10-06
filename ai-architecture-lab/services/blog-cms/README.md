@@ -6,6 +6,8 @@ Layered architecture example service. Contains src/ and tests/ directories.
 
 ```mermaid
 flowchart TD
+  title Layered Blog/CMS Architecture
+
   subgraph Presentation
     A[HTTP / GraphQL Controllers]
   end
@@ -21,17 +23,11 @@ flowchart TD
   end
 
   subgraph Infrastructure
-    F[Repository Implementations - DB]
+    F[Repository Implementations (DB)]
     G[Notification / Event Bus]
     H[Plugin Adapters]
   end
 
-  A --> B --> C
-  B --> D
-  D --> F
-  C --> E --> G
-  H --> B
-```
   A --> B --> C
   B --> D
   D --> F
