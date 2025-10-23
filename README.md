@@ -3,11 +3,6 @@ A hands-on collection of software architecture projects demonstrating modern des
 
 ---
 
-# ai-architecture-showcase
-A hands-on collection of software architecture projects demonstrating modern design patterns from layered and microservices to event-driven, CQRS, and AI-integrated systems.
-
----
-
 ## AI Architecture Lab — Repo & Pattern Mapping (PoEAA)
 
 **Purpose:** Maps PoEAA patterns to example services in the AI Architecture Lab GitHub repository, including why each pattern is used and the typical enterprise tech stack for real-world applications.
