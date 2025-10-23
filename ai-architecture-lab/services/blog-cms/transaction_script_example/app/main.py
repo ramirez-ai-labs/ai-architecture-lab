@@ -2,8 +2,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sqlite3
 from typing import List, Optional
+import os
 
-DB_PATH = "./posts.db"
+DB_PATH = os.getenv("DB_PATH", "./posts.db")
 
 app = FastAPI(title="Blog CMS - Transaction Script Example")
 
@@ -36,6 +37,14 @@ def init_db():
     )
     conn.commit()
     conn.close()
+
+
+# Ensure DB is initialized when module is imported (tests set DB_PATH before reload)
+try:
+    init_db()
+except Exception:
+    # ignore errors during import-time init (e.g., invalid path during import)
+    pass
 
 
 @app.on_event("startup")
