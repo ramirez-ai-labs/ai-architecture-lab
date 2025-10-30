@@ -1,17 +1,17 @@
-"""HTTP API wiring for the Bank CQRS minimal example.
+"""HTTP API wiring for this example (Bank CQRS - Minimal).
 
-This module maps HTTP requests to the Service Layer (AccountService).
-It demonstrates the typical flow in a CQRS-style app:
+Summary
+-------
+Maps HTTP endpoints to the Service Layer and shows the end-to-end flow:
+command (write) handling, publishing events, and read-model projection.
 
-- HTTP endpoint receives a command/query
-- Endpoint calls Service methods to perform business logic (write side)
-- Service updates the write-model via the repository and publishes events
-- A projection (subscribed in startup) updates the read-model
-- Query endpoints read from the read-model for fast responses
-
-For learners: focus on the clear separation between command handling
- (endpoints that mutate state) and query endpoints that read the
- denormalized read-model.
+Learner notes
+------------
+- Command handlers call `AccountService` methods (the write-side).
+- The example uses a synchronous in-process projection for simplicity so
+    the read-model is updated immediately (deterministic behavior for
+    demonstrations and tests).
+- `DB_PATH` can be overridden for tests to isolate SQLite files.
 """
 
 from fastapi import FastAPI, HTTPException

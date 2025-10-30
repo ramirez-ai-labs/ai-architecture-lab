@@ -1,22 +1,22 @@
-"""Transaction Script demo (Blog CMS).
+"""Transaction Script HTTP handlers for a tiny Blog CMS.
 
-Key idea: Domain logic is implemented as Transaction Scripts.
-Each HTTP handler is a small, explicit procedure that:
-    1) opens a DB connection, 2) runs SQL, 3) commits/closes, 4) returns a
-         simple DTO. That mapping makes it obvious what each request does.
+Summary
+-------
+Each HTTP handler is a short, procedural transaction script that performs
+the needed CRUD operation. This keeps the request flow explicit and
+easy to follow for learners.
 
-Where this pattern is a good fit:
-- Small apps or admin/UIs with simple CRUD flows.
-- When you want the request flow to be easy to read and debug.
+What this demonstrates
+----------------------
+- Transaction Script pattern: request handlers contain the domain logic
+- Simple DTOs via Pydantic
+- How to use `DB_PATH` to isolate SQLite files for tests
 
-When to refactor away from Transaction Script:
-- As logic grows, move shared rules into service functions or a domain
-    layer to avoid duplication and to improve testability.
-
-Notes:
-- `DB_PATH` (env) controls the SQLite file (default: ./posts.db).
-- Tests set `DB_PATH` to a temp file and reload this module to create
-    an isolated DB for each test run.
+Notes for learners
+------------------
+- The example uses `DB_PATH` (env) to control the SQLite file (default
+  `./posts.db`). Tests set `DB_PATH` to a temp file and reload the
+  module to get an isolated DB for each test run.
 """
 
 from fastapi import FastAPI, HTTPException
