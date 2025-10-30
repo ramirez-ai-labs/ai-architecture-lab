@@ -1,7 +1,21 @@
 """Service layer implementing business rules for accounts.
 
-Service methods are thin transaction scripts that orchestrate repository
-calls and publish events for projections.
+This module shows a simple Service Layer: each method implements a unit
+of business logic (create, deposit, withdraw, transfer). The Service
+Layer coordinates repository calls (persistence) and publishes events
+for projections (read-model updates).
+
+Notes for learners:
+- Inputs/outputs: methods accept primitive types and return simple
+    values (ids or balances). Errors are raised for invalid inputs or
+    business rule violations (eg. insufficient funds).
+- Transaction handling: for simplicity we open and commit sqlite
+    transactions directly here via the repository. In a larger app you'd
+    move transactional boundaries to a dedicated unit-of-work.
+- Events: we publish events after write-model changes. The demo uses a
+    synchronous in-process projection so the read-model is updated
+    immediately; in real-world CQRS you may have async/eventual
+    consistency via a message broker.
 """
 from typing import Optional
 from . import repository
@@ -14,10 +28,17 @@ class InsufficientFunds(Exception):
 
 class AccountService:
     def create_account(self, owner: str, initial_balance: float = 0.0) -> int:
+        # write-model: insert the account row and return its id
         aid = repository.create_account(owner, initial_balance)
-        # publish projection event
+
+        # publish an event describing what changed. In a real system this
+        # would be emitted to a broker so other services/workers could
+        # react asynchronously.
         events.publish({"type": "account_changed", "account_id": aid, "balance": float(initial_balance)})
-        # synchronous projection for demo: also update read-model directly
+
+        # For this small demo we also update the read-model synchronously
+        # so queries immediately reflect the change. This keeps the
+        # example deterministic and easy to follow for learners.
         repository.upsert_account_balance(aid, float(initial_balance))
         return aid
 
@@ -37,6 +58,10 @@ class AccountService:
         finally:
             conn.close()
 
+        # After mutating the write-model, publish an event and update the
+        # read-model so queries can read the new balance. The event allows
+        # decoupled projections in a real system; here it co-exists with a
+        # direct upsert for simplicity.
         events.publish({"type": "account_changed", "account_id": account_id, "balance": new_balance})
         repository.upsert_account_balance(account_id, new_balance)
         return new_balance

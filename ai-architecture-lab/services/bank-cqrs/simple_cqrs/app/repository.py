@@ -1,8 +1,15 @@
 """Repository (Table Data Gateway) for the Bank CQRS demo.
 
-Encapsulates SQL and connection handling. The service layer uses this
-module for persistence. The module also exposes a small read-model
-projection function to keep the CQRS example simple and synchronous.
+This module centralizes all SQL and connection handling. The Service
+Layer calls functions from this module to read and write the write-
+model (the `accounts` table). For the CQRS demo we also expose a
+small read-model (denormalized) API backed by `account_balances`.
+
+Learner notes:
+- Table Data Gateway: single module responsible for table-level SQL.
+- Read vs Write models: `accounts` is the canonical write model; the
+    `account_balances` table is a denormalized read-model used by query
+    endpoints for fast access.
 """
 import sqlite3
 import os
@@ -12,6 +19,11 @@ DB_PATH = os.getenv("DB_PATH", "./bank.db")
 
 
 def get_db_conn():
+    """Return a sqlite3 connection configured to return rows as dict-like objects.
+
+    We centralize connection creation so tests can monkeypatch DB_PATH and
+    create isolated DB files.
+    """
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
@@ -42,6 +54,7 @@ def init_db():
 
 
 def create_account(owner: str, initial_balance: float = 0.0) -> int:
+    # Insert into the write-model (accounts) and return the generated id
     conn = get_db_conn()
     cur = conn.cursor()
     cur.execute("INSERT INTO accounts (owner, balance) VALUES (?, ?)", (owner, float(initial_balance)))
@@ -68,6 +81,8 @@ def list_accounts() -> List[Dict]:
 
 
 def upsert_account_balance(account_id: int, balance: float) -> None:
+    # Maintain the denormalized read-model. ON CONFLICT ensures we can
+    # insert-or-update in a single statement.
     conn = get_db_conn()
     cur = conn.cursor()
     cur.execute("INSERT INTO account_balances (account_id, balance) VALUES (?, ?) ON CONFLICT(account_id) DO UPDATE SET balance=excluded.balance", (account_id, float(balance)))

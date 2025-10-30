@@ -1,3 +1,19 @@
+"""HTTP API wiring for the Bank CQRS minimal example.
+
+This module maps HTTP requests to the Service Layer (AccountService).
+It demonstrates the typical flow in a CQRS-style app:
+
+- HTTP endpoint receives a command/query
+- Endpoint calls Service methods to perform business logic (write side)
+- Service updates the write-model via the repository and publishes events
+- A projection (subscribed in startup) updates the read-model
+- Query endpoints read from the read-model for fast responses
+
+For learners: focus on the clear separation between command handling
+ (endpoints that mutate state) and query endpoints that read the
+ denormalized read-model.
+"""
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
@@ -38,8 +54,10 @@ class AmountIn(BaseModel):
 def startup():
     # ensure DB and read-model exist
     repository.init_db()
-
-    # register a simple projection: when an account changes, update read model
+    # register a simple, in-process projection: when an account changes,
+    # update the denormalized read-model table. In production this would
+    # usually be performed by asynchronous projection workers that
+    # subscribe to events from a broker.
     def projection(event):
         if event.get("type") == "account_changed":
             repository.upsert_account_balance(event["account_id"], event["balance"])
