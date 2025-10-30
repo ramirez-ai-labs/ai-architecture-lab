@@ -17,10 +17,10 @@ Below is a curated mapping of commonly used Patterns of Enterprise Application A
 
 | Pattern            | Confluence Page                   | GitHub Service                   | Why / Purpose                                                                                  | Typical Tech Stack                             | Fowler Pattern Name | Notes / Insights                                          |
 | ------------------ | --------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------- | --------------------------------------------------------- |
-| Transaction Script | Domain Logic → Transaction Script | services/blog-cms                | Handles simple CRUD per request; keeps logic procedural for small CMS workflows                | Python/FastAPI, Node/Express, PostgreSQL/MySQL | Transaction Script  | Simple, small-scale logic; easy to follow and debug       |
+| Transaction Script | Domain Logic → Transaction Script | services/blog-cms/transaction_script_example | Handles simple CRUD per request; keeps logic procedural for small CMS workflows                | Python/FastAPI, Node/Express, PostgreSQL/MySQL | Transaction Script  | Simple, small-scale logic; easy to follow and debug       |
 | Table Module       | Domain Logic → Table Module       | services/ecommerce-microservices | Centralizes business rules for all rows in a table; reduces duplication                        | Java/Spring Boot, PostgreSQL, Hibernate        | Table Module        | Ideal for batch processing and consistent domain logic    |
 | Domain Model       | Domain Logic → Domain Model       | services/chat-eda                | Rich objects represent domain entities with behavior; needed for AI pipelines                  | Python/FastAPI, SQLAlchemy, Redis              | Domain Model        | Maintains complex domain logic; testable and maintainable |
-| Service Layer      | Domain Logic → Service Layer      | services/bank-cqrs               | Defines application's boundary with a layer of services that coordinates application responses | Java/Spring Boot, REST/GraphQL                 | Service Layer       | Encapsulates domain logic and external API access         |
+| Service Layer      | Domain Logic → Service Layer      | services/bank-cqrs/simple_cqrs   | Defines application's boundary with a layer of services that coordinates application responses | Java/Spring Boot, REST/GraphQL                 | Service Layer       | Encapsulates domain logic and external API access         |
 
 ---
 
@@ -39,10 +39,10 @@ Below is a curated mapping of commonly used Patterns of Enterprise Application A
 
 | Pattern                       | Confluence Page   | GitHub Service                   | Why / Purpose                                                        | Typical Tech Stack             | Fowler Pattern Name           | Notes / Insights                                   |
 | ----------------------------- | ----------------- | -------------------------------- | -------------------------------------------------------------------- | ------------------------------ | ----------------------------- | -------------------------------------------------- |
-| Identity Map                  | OR → Identity Map | services/bank-cqrs               | Ensures a single instance per entity is loaded; prevents duplication | Java/Hibernate, Redis          | Identity Map                  | Improves consistency; reduces memory load          |
+| Identity Map                  | OR → Identity Map | services/bank-cqrs/simple_cqrs   | Ensures a single instance per entity is loaded; prevents duplication | Java/Hibernate, Redis          | Identity Map                  | Improves consistency; reduces memory load          |
 | Unit of Work                  | OR → Unit of Work | services/chat-eda                | Tracks object changes; commits once for efficiency                   | Python/SQLAlchemy, PostgreSQL  | Unit of Work                  | Useful for batch operations or AI model updates    |
 | Lazy Load                     | OR → Lazy Load    | services/ecommerce-microservices | Defers expensive DB loads until needed; improves performance         | Java/Hibernate, MySQL          | Lazy Load                     | Reduces unnecessary queries                        |
-| Optimistic / Pessimistic Lock | OR → Locking      | services/bank-cqrs               | Ensures safe concurrent updates                                      | Java/Spring, PostgreSQL/Oracle | Optimistic / Pessimistic Lock | Needed for high-concurrency financial transactions |
+| Optimistic / Pessimistic Lock | OR → Locking      | services/bank-cqrs/simple_cqrs   | Ensures safe concurrent updates                                      | Java/Spring, PostgreSQL/Oracle | Optimistic / Pessimistic Lock | Needed for high-concurrency financial transactions |
 
 ---
 
@@ -66,7 +66,7 @@ Below is a curated mapping of commonly used Patterns of Enterprise Application A
 | Remote Facade           | Integration → Remote Facade | services/ecommerce-microservices | Simplifies service-to-service interactions                    | Java/Spring Boot, REST/GraphQL, Nginx         | Remote Facade           | Reduces network complexity                               |
 | Gateway / Adapter       | Integration → Gateway       | common/adapters                  | Bridges incompatible service APIs                             | Python/FastAPI, Node/Express, Kafka           | Gateway / Adapter       | Standardizes communication between heterogeneous systems |
 | Message Bus / Messaging | Integration → Messaging     | services/ecommerce-microservices | Implements event-driven communication                         | RabbitMQ, Kafka, Redis Streams                | Message Bus / Messaging | Supports decoupled, scalable systems                     |
-| Service Layer           | Integration → Service Layer | services/bank-cqrs               | Provides a uniform API for business operations                | Java/Spring Boot, REST/GraphQL                | Service Layer           | Encapsulates domain logic for external clients           |
+| Service Layer           | Integration → Service Layer | services/bank-cqrs/simple_cqrs   | Provides a uniform API for business operations                | Java/Spring Boot, REST/GraphQL                | Service Layer           | Encapsulates domain logic for external clients           |
 
 ---
 
@@ -83,10 +83,10 @@ Below is a curated mapping of commonly used Patterns of Enterprise Application A
 
 | Pattern                  | Confluence Page                      | GitHub Service     | Why / Purpose                                     | Typical Tech Stack             | Fowler Pattern Name      | Notes / Insights                         |
 | ------------------------ | ------------------------------------ | ------------------ | ------------------------------------------------- | ------------------------------ | ------------------------ | ---------------------------------------- |
-| Optimistic Offline Lock  | Offline Concurrency → Optimistic     | services/bank-cqrs | Detects conflicts and rolls back transactions     | Java/Spring, PostgreSQL/Oracle | Optimistic Offline Lock  | Useful for low-contention scenarios      |
-| Pessimistic Offline Lock | Offline Concurrency → Pessimistic    | services/bank-cqrs | Allows only one transaction at a time             | Java/Spring, PostgreSQL/Oracle | Pessimistic Offline Lock | Needed for high-contention scenarios     |
-| Coarse-Grained Lock      | Offline Concurrency → Coarse-Grained | services/bank-cqrs | Locks a set of related objects with a single lock | Java/Spring, PostgreSQL/Oracle | Coarse-Grained Lock      | Simplifies complex transactional control |
-| Implicit Lock            | Offline Concurrency → Implicit       | services/bank-cqrs | Allows framework code to acquire offline locks    | Java/Spring, PostgreSQL/Oracle | Implicit Lock            | Used by frameworks to manage concurrency |
+| Optimistic Offline Lock  | Offline Concurrency → Optimistic     | services/bank-cqrs/simple_cqrs | Detects conflicts and rolls back transactions     | Java/Spring, PostgreSQL/Oracle | Optimistic Offline Lock  | Useful for low-contention scenarios      |
+| Pessimistic Offline Lock | Offline Concurrency → Pessimistic    | services/bank-cqrs/simple_cqrs | Allows only one transaction at a time             | Java/Spring, PostgreSQL/Oracle | Pessimistic Offline Lock | Needed for high-contention scenarios     |
+| Coarse-Grained Lock      | Offline Concurrency → Coarse-Grained | services/bank-cqrs/simple_cqrs | Locks a set of related objects with a single lock | Java/Spring, PostgreSQL/Oracle | Coarse-Grained Lock      | Simplifies complex transactional control |
+| Implicit Lock            | Offline Concurrency → Implicit       | services/bank-cqrs/simple_cqrs | Allows framework code to acquire offline locks    | Java/Spring, PostgreSQL/Oracle | Implicit Lock            | Used by frameworks to manage concurrency |
 
 ---
 
