@@ -1,36 +1,69 @@
-"""Transaction Script HTTP handlers for a tiny Blog CMS.
+"""
+Beginner Guide: Transaction Script Pattern (Tiny Blog CMS)
+==========================================================
 
-Summary
--------
-Each HTTP handler is a short, procedural transaction script that performs
-the needed CRUD operation. This keeps the request flow explicit and
-easy to follow for learners.
+This example shows how to build a very small Blog CMS using the
+**Transaction Script** pattern. It is intentionally simple so new
+developers can clearly follow how each request is handled.
 
-What this demonstrates
-----------------------
-- Transaction Script pattern: request handlers contain the domain logic
-- Simple DTOs via Pydantic
-- How to use `DB_PATH` to isolate SQLite files for tests
+What is the Transaction Script pattern?
+---------------------------------------
+In this pattern, each API endpoint contains all the steps needed to
+complete one database “transaction.”
+
+For example, the POST /posts endpoint:
+    1. Receives input data
+    2. Opens the database
+    3. Inserts a row with SQL
+    4. Saves (commits) the change
+    5. Returns a response
+
+This makes the flow very easy to understand, especially for beginners.
+
+What you will learn from this example
+-------------------------------------
+- How FastAPI routes work  
+- How to validate data using **Pydantic** models  
+- How to store data using **SQLite**, a built-in file-based database  
+- How Transaction Script keeps logic simple and visible in each endpoint  
+- How to use the `DB_PATH` environment variable to control which database file is used  
+  (especially useful for tests)
 
 Notes for learners
 ------------------
-- The example uses `DB_PATH` (env) to control the SQLite file (default
-  `./posts.db`). Tests set `DB_PATH` to a temp file and reload the
-  module to get an isolated DB for each test run.
+- SQLite stores everything in a single .db file.  
+- `DB_PATH` selects which file to use (default: `./posts.db`).  
+- Tests override this path so every test runs on a clean database.  
+- No ORMs (like SQLAlchemy) are used here — only raw SQL so you can
+  clearly see how data is saved and retrieved.
 """
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sqlite3
-from typing import List, Optional
+from typing import List
 import os
 
-# DB path can be overridden by environment (useful for tests)
+# ==============================================================
+# DATABASE CONFIGURATION
+# ==============================================================
+
+# DB_PATH tells our app where to store the SQLite database file.
+# Beginner tip: Think of this as the “filename” for our little database.
+# Tests can override this path to use a temporary database.
 DB_PATH = os.getenv("DB_PATH", "./posts.db")
 
+# Create the FastAPI application.
 app = FastAPI(title="Blog CMS - Transaction Script Example")
 
 
+# ==============================================================
+# DATA MODELS (Pydantic)
+# ==============================================================
+
+# These models define the structure of data coming in and out of our API.
+# PostIn  = what the client sends (title + content)
+# PostOut = what we return (includes database-generated id)
 class PostIn(BaseModel):
     title: str
     content: str
@@ -40,13 +73,28 @@ class PostOut(PostIn):
     id: int
 
 
+# ==============================================================
+# DATABASE HELPERS
+# ==============================================================
+
 def get_db_conn():
+    """
+    Open a connection to the SQLite database.
+
+    SQLite uses a single file on disk.
+    This function is like 'opening that file' so we can read/write data.
+    """
     conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = sqlite3.Row  # Lets us access columns by name
     return conn
 
 
 def init_db():
+    """
+    Create the posts table if it does not already exist.
+
+    This allows the app to run even if the database file is brand new.
+    """
     conn = get_db_conn()
     conn.execute(
         """
@@ -61,75 +109,144 @@ def init_db():
     conn.close()
 
 
-# Ensure DB is initialized when module is imported (tests set DB_PATH before reload)
+# Initialize the DB as soon as the file loads.
 try:
     init_db()
 except Exception:
-    # ignore errors during import-time init (e.g., invalid path during import)
+    # If DB_PATH is invalid during import (e.g., in tests), ignore the error.
     pass
 
 
 @app.on_event("startup")
 def startup():
+    """Runs when FastAPI starts — ensures table exists."""
     init_db()
 
 
+# ==============================================================
+# ROUTES (CRUD ENDPOINTS)
+# ==============================================================
+
+# ---------------------------
+# CREATE A NEW POST
+# ---------------------------
 @app.post("/posts", response_model=PostOut)
 def create_post(post: PostIn):
-    # Transaction Script: the handler itself is the transaction script.
-    # Steps: open connection, execute SQL, commit, return DTO.
+    """
+    Create a new blog post.
+
+    Steps (Transaction Script):
+    1. Open DB
+    2. Insert a row using SQL
+    3. Commit the change
+    4. Return the new record to the client
+    """
     conn = get_db_conn()
     cur = conn.cursor()
-    cur.execute("INSERT INTO posts (title, content) VALUES (?, ?)", (post.title, post.content))
+
+    cur.execute(
+        "INSERT INTO posts (title, content) VALUES (?, ?)",
+        (post.title, post.content)
+    )
+
     conn.commit()
-    post_id = cur.lastrowid
+    post_id = cur.lastrowid  # ID generated by SQLite
     conn.close()
+
     return {"id": post_id, "title": post.title, "content": post.content}
 
 
+# ---------------------------
+# LIST ALL POSTS
+# ---------------------------
 @app.get("/posts", response_model=List[PostOut])
 def list_posts():
-    # Transaction Script for listing: read-only script that returns DTOs.
+    """
+    Return all posts in the database.
+
+    This is a read-only transaction.
+    """
     conn = get_db_conn()
-    rows = conn.execute("SELECT id, title, content FROM posts ORDER BY id DESC").fetchall()
+    rows = conn.execute(
+        "SELECT id, title, content FROM posts ORDER BY id DESC"
+    ).fetchall()
     conn.close()
+
+    # Convert SQLite rows into PostOut objects
     return [PostOut(id=r["id"], title=r["title"], content=r["content"]) for r in rows]
 
 
+# ---------------------------
+# GET A SINGLE POST BY ID
+# ---------------------------
 @app.get("/posts/{post_id}", response_model=PostOut)
 def get_post(post_id: int):
-    # Transaction Script: single-row read and DTO mapping.
+    """
+    Return one post by its ID.
+
+    If the post does not exist, return a 404 error.
+    """
     conn = get_db_conn()
-    row = conn.execute("SELECT id, title, content FROM posts WHERE id = ?", (post_id,)).fetchone()
+    row = conn.execute(
+        "SELECT id, title, content FROM posts WHERE id = ?",
+        (post_id,)
+    ).fetchone()
     conn.close()
+
     if not row:
         raise HTTPException(status_code=404, detail="Post not found")
+
     return PostOut(id=row["id"], title=row["title"], content=row["content"])
 
 
+# ---------------------------
+# UPDATE A POST
+# ---------------------------
 @app.put("/posts/{post_id}", response_model=PostOut)
 def update_post(post_id: int, post: PostIn):
-    # Transaction Script: update within one procedural handler.
+    """
+    Update an existing post.
+
+    Steps:
+    - Try to update the row
+    - If no rows were updated, the ID does not exist
+    """
     conn = get_db_conn()
     cur = conn.cursor()
-    cur.execute("UPDATE posts SET title = ?, content = ? WHERE id = ?", (post.title, post.content, post_id))
+
+    cur.execute(
+        "UPDATE posts SET title = ?, content = ? WHERE id = ?",
+        (post.title, post.content, post_id)
+    )
+
     if cur.rowcount == 0:
         conn.close()
         raise HTTPException(status_code=404, detail="Post not found")
+
     conn.commit()
     conn.close()
+
     return {"id": post_id, "title": post.title, "content": post.content}
 
 
+# ---------------------------
+# DELETE A POST
+# ---------------------------
 @app.delete("/posts/{post_id}")
 def delete_post(post_id: int):
-    # Transaction Script: delete operation handled entirely in the handler.
+    """
+    Delete a post by ID.
+    """
     conn = get_db_conn()
     cur = conn.cursor()
+
     cur.execute("DELETE FROM posts WHERE id = ?", (post_id,))
+
     if cur.rowcount == 0:
         conn.close()
         raise HTTPException(status_code=404, detail="Post not found")
+
     conn.commit()
     conn.close()
+
     return {"deleted": True}
