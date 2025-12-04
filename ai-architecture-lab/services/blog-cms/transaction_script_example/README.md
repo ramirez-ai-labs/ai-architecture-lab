@@ -72,7 +72,7 @@ flowchart TD
   A[Client request: GET /posts/1] --> B[FastAPI route: get_post]
   B --> C[Open SQLite database file]
   C --> D[Run SQL: SELECT * FROM posts WHERE id = 1]
-  D --> E[Convert row → Pydantic model (PostOut)]
+  D --> E[Convert row -> Pydantic model (PostOut)]
   E --> F[Return JSON response]
 ```
 
