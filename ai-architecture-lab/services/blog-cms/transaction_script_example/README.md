@@ -65,28 +65,18 @@ A small structure on purpose — easier learning!
 
 ## 🧭 How a Request Flows (Beginner Diagram)
 
-Example: `GET /posts/1`:
+Example: `GET /posts/1`
 
-Client Request
-|
-v
-FastAPI Route (get_post)
-|
-v
-Open SQLite database file
-|
-v
-Run SQL:
-SELECT * FROM posts WHERE id=1
-|
-v
-Convert DB row → Pydantic model (PostOut)
-|
-v
-Return JSON response
+```mermaid
+flowchart TD
+  A[Client request: GET /posts/1] --> B[FastAPI route: get_post]
+  B --> C[Open SQLite database file]
+  C --> D[Run SQL: SELECT * FROM posts WHERE id = 1]
+  D --> E[Convert row → Pydantic model (PostOut)]
+  E --> F[Return JSON response]
+```
 
-
-Every operation is easy to trace because logic stays in one place.
+Every operation is easy to trace because the logic stays in one place.
 
 ---
 
