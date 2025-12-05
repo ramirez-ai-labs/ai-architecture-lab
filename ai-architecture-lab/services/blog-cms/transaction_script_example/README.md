@@ -69,11 +69,11 @@ Example: `GET /posts/1`
 
 ```mermaid
 flowchart TD
-    A[Client request (GET /posts/1)] --> B[FastAPI route: get_post]
-    B --> C[Open SQLite database file]
-    C --> D[Run SQL: SELECT * FROM posts WHERE id=1]
-    D --> E[Convert row to Pydantic model]
-    E --> F[Return JSON response]
+  A["Client request (GET /posts/1)"] --> B["FastAPI route: get_post"]
+  B --> C["Open SQLite database file"]
+  C --> D["Run SQL: SELECT * FROM posts WHERE id = 1"]
+  D --> E["Convert row to Pydantic model"]
+  E --> F["Return JSON response"]
 ```
 
 Every operation is easy to trace because the logic stays in one place.
