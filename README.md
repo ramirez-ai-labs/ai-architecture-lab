@@ -1,6 +1,48 @@
 # ai-architecture-showcase
 A hands-on collection of software architecture projects demonstrating modern design patterns from layered and microservices to event-driven, CQRS, and AI-integrated systems.
 
+## Start Here (15–30 minutes)
+
+This repository demonstrates my practical understanding of enterprise and AI architecture patterns through **real, runnable systems**.
+
+If you want a quick but representative review:
+
+### 1️⃣ Transaction Script (Baseline Simplicity)
+📁 `services/blog-cms/transaction_script_example`
+
+- Demonstrates procedural business logic
+- Shows when *not* to use Domain Model
+- Uses raw SQL + explicit transactions
+
+▶️ What this proves: I understand when simplicity beats abstraction.
+
+---
+
+### 2️⃣ Domain Model + Data Mapper (Complex Business Logic)
+📁 `services/chat-eda/domain_model_example`
+
+- Rich domain entities with behavior
+- Business invariants enforced in the model
+- Repository / Data Mapper separation
+
+▶️ What this proves: I can design maintainable systems for complex, evolving domains (including AI pipelines).
+
+---
+
+### 3️⃣ CQRS + Service Layer (Enterprise Scale)
+📁 `services/bank-cqrs/simple_cqrs`
+
+- Clear command/query separation
+- Service Layer orchestration
+- Explicit tradeoffs vs CRUD
+
+▶️ What this proves: I can design scalable, enterprise-grade systems with clear boundaries.
+
+---
+
+After reviewing these, the sections below provide a **full PoEAA pattern reference map** for deeper exploration.
+
+
 ---
 
 ## AI Architecture Lab — Repo & Pattern Mapping (PoEAA)
