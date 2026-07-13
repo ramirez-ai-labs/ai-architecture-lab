@@ -45,6 +45,39 @@ After reviewing these, the sections below provide a **full PoEAA pattern referen
 
 ---
 
+## 🧩 Learning Path: PoEAA Katas
+
+Hands-on exercises to master Patterns of Enterprise Application Architecture (PoEAA) through practical implementation.
+
+### 1️⃣ Value Object (Base Pattern)
+📁 `ai-architecture-lab/katas/base-patterns/value_object/`
+
+- Implements immutable value objects
+- Demonstrates value-based equality
+- Foundation for domain modeling
+
+▶️ **What you'll learn**: Building blocks for rich domain models
+
+### 2️⃣ Money (Specialized Value Object)
+📁 `ai-architecture-lab/katas/base-patterns/money/`
+
+- Extends Value Object pattern
+- Implements currency handling and precision
+- Shows domain-specific operations
+
+▶️ **What you'll learn**: Specializing base patterns for domain needs
+
+### 3️⃣ Table Data Gateway
+📁 `ai-architecture-lab/katas/data-source/table_data_gateway/`
+
+- Implements database access pattern
+- Demonstrates CRUD operations
+- Shows separation of concerns
+
+▶️ **What you'll learn**: Data access patterns in enterprise applications
+
+---
+
 ## AI Architecture Lab — Repo & Pattern Mapping (PoEAA)
 
 **Purpose:** Maps PoEAA patterns to example services in the AI Architecture Lab GitHub repository, including why each pattern is used and the typical enterprise tech stack for real-world applications.

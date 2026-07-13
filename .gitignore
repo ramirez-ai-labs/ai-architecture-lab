@@ -149,3 +149,13 @@ Thumbs.db
 # Misc
 # ---------------------------
 .pypir
+
+# ---------------------------
+# Project status docs (internal use only)
+# ---------------------------
+AI_ASSISTANT_PROMPT.md
+CODING_STANDARDS.md
+NEXT_STEPS_ACTION_PLAN.md
+PATTERN_IMPLEMENTATION_STATUS.md
+PATTERN_ORGANIZATION_GUIDE.md
+PHASE_*.md
